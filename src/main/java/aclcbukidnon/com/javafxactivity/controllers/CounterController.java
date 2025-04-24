@@ -12,12 +12,16 @@ public class CounterController {
 
     @FXML
     protected void onPlusClick() {
-
+        int count = Integer.parseInt(labelCount.getText());
+        count++;
+        labelCount.setText(String.valueOf(count));
     }
 
     @FXML
     protected void onMinusClick() {
-
+        int count = Integer.parseInt(labelCount.getText());
+        count--;
+        labelCount.setText(String.valueOf(count));
     }
 
 

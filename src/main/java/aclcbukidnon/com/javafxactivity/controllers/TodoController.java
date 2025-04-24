@@ -5,29 +5,29 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 
 public class TodoController {
 
     @FXML
     private ListView<String> todoList;
 
+    ObservableList<String> initialItems = FXCollections.observableArrayList();
+
     @FXML
     public void initialize(){
-        ObservableList<String> initialItems = FXCollections.observableArrayList();
         initialItems.add("Remove Me");
 
         todoList.setItems(initialItems);
         todoList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        todoList.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldVal, newVal) ->
-                {
-
-                    if (newVal != null){
-                        onTodoListItemClick(newVal);
-                    }
+        todoList.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getClickCount() == 2) {
+                String selectedItem = todoList.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    onTodoListItemClick(selectedItem);
                 }
-
-        );
+            }
+        });
     }
 
 
@@ -36,9 +36,14 @@ public class TodoController {
         var dialog = new TextInputDialog(value);
         dialog.setTitle("Update Todo");
 
-
         var result = dialog.showAndWait();
-        result.ifPresent(text -> System.out.println(text));
+        result.ifPresent(text -> {
+            int index = initialItems.indexOf(value);
+            if (index != -1) {
+                initialItems.set(index, text);
+            }
+        });
+//        result.ifPresent(text -> System.out.println(text));
     }
 
 
@@ -48,9 +53,10 @@ public class TodoController {
         var dialog = new TextInputDialog("");
         dialog.setTitle("Create New Todo");
 
-
         var result = dialog.showAndWait();
-        result.ifPresent(text -> System.out.println(text));
+        result.ifPresent(text -> initialItems.add(text));
+
+//        result.ifPresent(text -> System.out.println(text));
     }
 
     @FXML
@@ -62,9 +68,10 @@ public class TodoController {
         confirm.setContentText("This action cannot be undone.");
 
         var result = confirm.showAndWait();
+
         if (result.isPresent()) {
-            result.get();
-        }// User clicked OK
+            initialItems.clear();
+        }
     }
 
     @FXML
